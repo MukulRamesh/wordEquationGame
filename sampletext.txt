@@ -1,0 +1,9 @@
+queen_NOUN - woman_NOUN + man_NOUN
+
+woman_NOUN + king_NOUN - man_NOUN
+
+daughter_NOUN - mother_NOUN + father_NOUN
+
+window_NOUN - glass_NOUN + iron_NOUN
+
+shirt_NOUN + woman_NOUN
