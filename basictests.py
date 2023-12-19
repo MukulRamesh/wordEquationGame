@@ -1,4 +1,4 @@
-import pynndescent.pynndescent_
+from pynndescent.pynndescent_ import NNDescent
 import numpy as np
 import random
 
@@ -32,7 +32,7 @@ for i in range(numWords):
 
 print("Matrix shape:", matrix.shape)
 
-indexNN = pynndescent.NNDescent(matrix, verbose=True)
+indexNN = NNDescent(matrix, verbose=True)
 indexNN.prepare()
 
 print("")
@@ -46,6 +46,7 @@ def wordsToVect(wordList: list[str]):
 
     for i in range(len(wordList)):
         word = wordList[i]
+        #print(word)
 
         if (word in operators):
             alter = word
@@ -56,11 +57,11 @@ def wordsToVect(wordList: list[str]):
             match alter:
                 case '+':
                     outputVector += vectPart
-                    print("Added", word)
+                    #print("Added", word)
 
                 case '-':
                     outputVector = outputVector - vectPart
-                    print("Subtracted", word)
+                    #print("Subtracted", word)
 
             alter = ' '
 
@@ -96,12 +97,69 @@ while True:
     numNegWords = 1
     numRandWords = numPosWords + numNegWords
 
-    print("Choosing random words...")
+    print("\n\nChoosing random words...")
+
+
+
+    ordering = [] #indicates a positive or negative word for its respective index
+    for i in range(numNegWords):
+        ordering.append('-')
+    for i in range(numPosWords):
+        ordering.append('+')
+    random.shuffle(ordering)
+
     randWordLis = []
+    indexLis = []
+    inputLis = []
     for i in range(numRandWords):
         randIndex = random.randrange(0, numWords)
-        randWordLis.append(indexWords)
+        indexLis.append(randIndex)
+        randWordLis.append(indexWordArray[randIndex][0])
+
+        inputLis.append(ordering[i])
+        inputLis.append(randWordLis[i])
+        print(i, ":", randWordLis[i])
+
+    sumVector = wordsToVect(inputLis)
+
+    arrayofVectors = np.empty((1, vectSize), dtype=np.ndarray)
+    arrayofVectors[0] = sumVector
+
+    k = 10 + numRandWords
+    indices, distances = indexNN.query(arrayofVectors, k=k)
+    outputWord = "!!None!!"
+
+    for i in range(k):
+        generatedGuess = indexWordArray[indices[0][i]][0]
+
+        if generatedGuess in randWordLis:
+            continue
+        else:
+            outputWord = generatedGuess
+
+    print("= :", outputWord)
 
 
+    print("There are", numNegWords, "-'s and", numPosWords, "+'s.")
 
-    wordList = input("Input the digits that correspond with the words, with + or - (for example: +1 +2 -3): ").split(" ")
+    while True:
+        try:
+            correctFlag = True
+            wordList = input("Input the digits that correspond with the words, with + or - (for example: +0 +1 -2): ").split(" ")
+            for word in wordList:
+                order = word[0]
+                wordNum = int(word[1])
+
+                if ordering[wordNum] != order:
+                    print("Oh no! Looks like your answer was incorrect. Try again...")
+                    correctFlag = False
+                    break
+
+            if correctFlag:
+                print("Great job! You got it correct.")
+                break
+
+        except not KeyboardInterrupt:
+            print("Incorrect formatting. Make sure the format is followed correctly.")
+
+
