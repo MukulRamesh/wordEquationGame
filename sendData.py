@@ -1,7 +1,8 @@
 import asyncio
 import websockets
+import basictests
 
-async def hello(websocket):
+async def hello(websocket: websockets.WebSocketServer):
     while True:
         name = await websocket.recv()
         print(f"<<< {name}")
