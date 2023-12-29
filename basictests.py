@@ -1,4 +1,4 @@
-from pynndescent.pynndescent_ import NNDescent
+import pickle
 import numpy as np
 import random
 
@@ -32,11 +32,12 @@ for i in range(numWords):
 
 print("Matrix shape:", matrix.shape)
 
-indexNN = NNDescent(matrix, verbose=True)
-indexNN.prepare()
+print("Loading saved index file...")
+fileName = 'CommonMatrixIndex.bin' # hardcoded filename
+indexNN = pickle.load(open(fileName, 'rb'))
+print("Done.")
 
-print("")
-
+print("-- Initialization Complete --")
 
 
 def wordsToVect(wordList: list[str]):
@@ -68,27 +69,27 @@ def wordsToVect(wordList: list[str]):
 
 
         else:
-            print("Improper String or Unknown Word")
-            return -1
+            print("Improper String or Unknown Word:", word)
+            raise TypeError
 
     return outputVector
 
 
-print("Initialization Complete")
+
 
 def getRandomWords(numRand: int, forbidden: list[str] = []):
     '''
-    Takes in numRand, and an optional list of forbidden words. \n
+    Takes in `numRand`, and an optional list of forbidden words. \n
     Returns tuple containing a numpy array that contains numRand distinct word vectors, and a list with the corresponding names'''
     outputVec = np.empty((numRand, vectSize), dtype=np.ndarray)
     outputWords = []
     for i in range(numRand):
-        index = random.randint[0, numWords]
-        randomWord = indexWordArray[index]
+        index = random.randint(0, numWords)
+        randomWord = indexWordArray[index][0]
 
         while (randomWord in forbidden):
-            index = random.randint[0, numWords]
-            randomWord = indexWordArray[index]
+            index = random.randint(0, numWords)
+            randomWord = indexWordArray[index][0]
 
         outputWords.append(randomWord)
         outputVec[i] = matrix[index]
@@ -101,19 +102,18 @@ def getRandomWords(numRand: int, forbidden: list[str] = []):
 
 def generateRandomAverage(numRandomWords: int, forbidden: list[str] = [], kAppend: int = 10):
     '''
-    Takes in numRandomWords optional list of forbidden words, and an optional value kAppend of extra words to generate (only the first distinct numRandomWords words are returned).\n
-    Returns a list of numRandomWords+1 distinct random words. The last word is the average of the first numRandomWords words.'''
+    Takes in int `numRandomWords`, an optional list of forbidden words, and an optional int `kAppend` of extra words to generate (only the first distinct numRandomWords words are returned).\n
+    Returns a list of `numRandomWords+1` distinct random words. The last word is the average of the first `numRandomWords` words.'''
 
     vectors, names = getRandomWords(numRandomWords, forbidden)
 
     forbidden.extend(names)
-    string = ""
+    stringList = []
     for i in range(numRandomWords):
-        string += names[i] + "+"
+        stringList.extend((names[i], "+"))
+    stringList.pop()
 
-    string.strip("+")
-
-    averageVector = wordsToVect(string) / numRandomWords
+    averageVector = wordsToVect(stringList) / numRandomWords
 
     arrayofVectors = np.empty((1, vectSize), dtype=np.ndarray)
     arrayofVectors[0] = averageVector
@@ -135,9 +135,9 @@ def generateRandomAverage(numRandomWords: int, forbidden: list[str] = [], kAppen
     return names
 
 def checkAverage(wordList: list[str], kAppend: int = 10):
-    '''Takes in a list of 2 or more words, and an optional integer kAppend denoting kAppend extra words to generate.\n
+    '''Takes in a list of 2 or more words, and an optional integer `kAppend` denoting `kAppend` extra words to generate.\n
     Returns a boolean representing whether the last word in the list is the average of the rest.\n
-    (Generates wordList.length + kAAppend - 1 possible averages: if the last word matches any of these, returns true)
+    (Generates `wordList.length + kAAppend - 1` possible averages: if the last word matches any of these, returns true)
     '''
     possibleAverage = wordList.pop()
     wordListLen = len(wordList)
