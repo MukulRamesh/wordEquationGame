@@ -10,31 +10,24 @@ sizeStr = f.readline().split(" ")
 numWords = int(sizeStr[0])
 vectSize = int(sizeStr[1])
 
-matrix = np.empty((numWords, vectSize), dtype=np.ndarray)
-wordIndexDict = dict()
-indexWordArray = np.empty((numWords, 1), dtype=np.ndarray)
+f.close()
 
+matrixFileName = 'Matrix.bin'
+wordIndexFileName = 'WordToIndex.bin'
+indexWordFileName = 'IndexToWord.bin'
 
-for i in range(numWords):
-    strList = f.readline().split(" ")
-    vector = np.empty(vectSize, dtype=object)
+indexFileName = 'CommonMatrixIndex.bin'
 
-    wordIndexDict[strList[0]] = i
-    indexWordArray[i] = strList[0]
-
-    for j in range(vectSize):
-        vector[j] = float(strList[j + 1])
-
-    matrix[i] = vector
-
-    if (i % 1000 == 0):
-        print(i, '/', numWords)
+print("Loading saved matrix file...")
+matrix = pickle.load(open(matrixFileName, 'rb'))
+print("Loading saved wordIndex file...")
+wordIndexDict = pickle.load(open(wordIndexFileName, 'rb'))
+print("Loading saved indexWord file...")
+indexWordArray = pickle.load(open(indexWordFileName, 'rb'))
+print("Loading saved index file...")
+indexNN = pickle.load(open(indexFileName, 'rb'))
 
 print("Matrix shape:", matrix.shape)
-
-print("Loading saved index file...")
-fileName = 'CommonMatrixIndex.bin' # hardcoded filename
-indexNN = pickle.load(open(fileName, 'rb'))
 print("Done.")
 
 print("-- Initialization Complete --")
@@ -134,7 +127,7 @@ def generateRandomAverage(numRandomWords: int, forbidden: list[str] = [], kAppen
 
     return names
 
-def checkAverage(wordList: list[str], kAppend: int = 10):
+def checkAverage(wordList: list[str], kAppend: int = 20):
     '''Takes in a list of 2 or more words, and an optional integer `kAppend` denoting `kAppend` extra words to generate.\n
     Returns a boolean representing whether the last word in the list is the average of the rest.\n
     (Generates `wordList.length + kAAppend - 1` possible averages: if the last word matches any of these, returns true)
@@ -142,13 +135,12 @@ def checkAverage(wordList: list[str], kAppend: int = 10):
     possibleAverage = wordList.pop()
     wordListLen = len(wordList)
 
-    string = ""
-    for i in range(wordListLen):
-        string += wordList[i] + "+"
+    stringList = []
+    for word in wordList:
+        stringList.extend((word, "+"))
+    stringList.pop()
 
-    string.strip("+")
-
-    averageVector = wordsToVect(string) / wordListLen
+    averageVector = wordsToVect(stringList) / wordListLen
 
     arrayofVectors = np.empty((1, vectSize), dtype=np.ndarray)
     arrayofVectors[0] = averageVector

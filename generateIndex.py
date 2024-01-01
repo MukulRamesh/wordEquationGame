@@ -36,10 +36,30 @@ indexNN = NNDescent(matrix, verbose=True)
 indexNN.prepare()
 
 
-fileName = 'CommonMatrixIndex.bin'
-dbfile = open(fileName, 'ab')
+indexFileName = 'CommonMatrixIndex.bin'
+matrixFileName = 'Matrix.bin'
+wordIndexFileName = 'WordToIndex.bin'
+indexWordFileName = 'IndexToWord.bin'
+
+dbfile = open(indexFileName, 'wb')
 pickle.dump(indexNN, dbfile)
 dbfile.close()
 
+dbfile = open(matrixFileName, 'wb')
+pickle.dump(matrix, dbfile)
+dbfile.close()
+
+dbfile = open(wordIndexFileName, 'wb')
+pickle.dump(wordIndexDict, dbfile)
+dbfile.close()
+
+dbfile = open(indexWordFileName, 'wb')
+pickle.dump(indexWordArray, dbfile)
+dbfile.close()
+
 print()
-print("Index stored in", fileName)
+print("IndexedMatrix stored in", indexFileName)
+print("Matrix stored in", matrixFileName)
+print("WordIndex stored in", wordIndexFileName)
+print("IndexWord stored in", indexWordFileName)
+
