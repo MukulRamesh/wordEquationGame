@@ -51,6 +51,8 @@ async def clientHandler(websocket: websockets.WebSocketServer):
 
     except websockets.exceptions.ConnectionClosedOK:
         print("Client closed connection abruptly (OK)")
+    except websockets.exceptions.ConnectionClosed:
+        print("Client closed connection abruptly (No Closing Message)")
 
 
 

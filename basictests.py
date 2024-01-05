@@ -127,7 +127,11 @@ def generateRandomAverage(numRandomWords: int, forbidden: list[str] = [], kAppen
 
     return names
 
-def checkAverage(wordList: list[str], kAppend: int = 20):
+
+#Some anecdotal evidence for checkAverage:
+#   kAppend == 10 has >90% false negatives, kAppend == 20 has ~5% false negatives
+#   I am using kAppend == 30 to hopefully bring that number to 0, with the risk of significant false positives.
+def checkAverage(wordList: list[str], kAppend: int = 30):
     '''Takes in a list of 2 or more words, and an optional integer `kAppend` denoting `kAppend` extra words to generate.\n
     Returns a boolean representing whether the last word in the list is the average of the rest.\n
     (Generates `wordList.length + kAAppend - 1` possible averages: if the last word matches any of these, returns true)
