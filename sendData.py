@@ -3,10 +3,20 @@ import websockets
 import json
 import random
 import basictests
+import clientid
+from datetime import timedelta
 
-def swapPositions(list, pos1, pos2):
-    list[pos1], list[pos2] = list[pos2], list[pos1]
-    return list
+# hardcoding how long each task should be open for here:
+get3Time = timedelta(seconds=60)
+
+def terminationOutput():
+    '''Generates termination output json. This is what is sent to client when they ask for a response,
+    but should not get one (ie, after time runs out).'''
+    output = dict()
+    output['code'] = "terminate"
+
+    return output
+
 
 async def hello(websocket: websockets.WebSocketServer):
     while True:
@@ -21,26 +31,52 @@ async def hello(websocket: websockets.WebSocketServer):
 
 async def clientHandler(websocket: websockets.WebSocketServer):
 
+
     try:
         while True:
             recievedJSON = await websocket.recv()
             requestjson = json.loads(recievedJSON)
+
             output = dict()
 
-            # requestjson follow the following syntax:
-            # 'code' is always all lowercase. responses from server have the 'response' suffix
-            # first code, then response, then else
+            # requestjson has the following syntax:
+            # requestjson['code'] is always all lowercase and numeric. responses from server have the 'response' suffix
+
             match requestjson['code']:
+                case "getid":
+                    task = requestjson['task']
+                    output['code'] = 'getidresponse'
+                    output['response'] = newID = clientid.getNewID()
+                    clientid.setIDtask(newID, task)
+
+
                 case "get3":
-                    output['code'] = 'get3response'
-                    output['response'] = basictests.generateRandomAverage(2)
-                    print(output['response'])
-                    random.shuffle(output['response'])
+                    try:
+                        newID = requestjson['id']
+                        if (clientid.isIDInTask(newID, get3Time, "get3")):
+                            output['code'] = 'get3response'
+                            output['response'] = basictests.generateRandomAverage(2)
+                            print(output['response'])
+                            random.shuffle(output['response'])
+                        else:
+                            output = terminationOutput()
+                    except KeyError:
+                        print("Recieved malformed json", requestjson['code'])
+
 
                 case "check3":
-                    output['code'] = 'check3response'
-                    requestjson['solution'][1], requestjson['solution'][2] = requestjson['solution'][2], requestjson['solution'][1] #swap elems to fit function checkAverage
-                    output['response'] = basictests.checkAverage(requestjson['solution'])
+                    try:
+                        newID = requestjson['id']
+                        if (clientid.isIDInTask(newID, get3Time, "get3")):
+                            output['code'] = 'check3response'
+                            requestjson['solution'][1], requestjson['solution'][2] = requestjson['solution'][2], requestjson['solution'][1] #swap elems to fit function checkAverage
+                            output['response'] = basictests.checkAverage(requestjson['solution'])
+                        else:
+                            output = terminationOutput()
+                    except KeyError:
+                        print("Recieved malformed json", requestjson['code'])
+
+
 
                 case _:
                     print("Recieved unknown code")
