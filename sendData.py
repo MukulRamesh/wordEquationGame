@@ -4,10 +4,6 @@ import json
 import random
 import basictests
 import clientid
-from datetime import timedelta
-
-# hardcoding how long each task should be open for here:
-get3Time = timedelta(seconds=60)
 
 def terminationOutput():
     '''Generates termination output json. This is what is sent to client when they ask for a response,
@@ -30,8 +26,6 @@ async def hello(websocket: websockets.WebSocketServer):
 
 
 async def clientHandler(websocket: websockets.WebSocketServer):
-
-
     try:
         while True:
             recievedJSON = await websocket.recv()
@@ -43,21 +37,31 @@ async def clientHandler(websocket: websockets.WebSocketServer):
             # requestjson['code'] is always all lowercase and numeric. responses from server have the 'response' suffix
 
             match requestjson['code']:
+                # below are id related codes
                 case "getid":
                     task = requestjson['task']
                     output['code'] = 'getidresponse'
                     output['response'] = newID = clientid.getNewID()
                     clientid.setIDtask(newID, task)
 
+                case "checkid":
+                    try:
+                        newID = requestjson['id']
+                        task = requestjson['task']
+                        output['code'] = 'checkidresponse'
+                        output['response'] = not clientid.isIDInTask(newID, task)
+                    except KeyError:
+                        print("Recieved malformed json", requestjson['code'])
 
+                # below are 'get3' related codes
                 case "get3":
                     try:
                         newID = requestjson['id']
-                        if (clientid.isIDInTask(newID, get3Time, "get3")):
+                        if (clientid.isIDInTask(newID, "get3")):
                             output['code'] = 'get3response'
                             output['response'] = basictests.generateRandomAverage(2)
                             print(output['response'])
-                            random.shuffle(output['response'])
+                            random.shuffle(output['response']) # maybe this isnt secure enough? its probably ok for now
                         else:
                             output = terminationOutput()
                     except KeyError:
@@ -67,7 +71,7 @@ async def clientHandler(websocket: websockets.WebSocketServer):
                 case "check3":
                     try:
                         newID = requestjson['id']
-                        if (clientid.isIDInTask(newID, get3Time, "get3")):
+                        if (clientid.isIDInTask(newID, "get3")):
                             output['code'] = 'check3response'
                             requestjson['solution'][1], requestjson['solution'][2] = requestjson['solution'][2], requestjson['solution'][1] #swap elems to fit function checkAverage
                             output['response'] = basictests.checkAverage(requestjson['solution'])
@@ -78,6 +82,7 @@ async def clientHandler(websocket: websockets.WebSocketServer):
 
 
 
+                # base case
                 case _:
                     print("Recieved unknown code")
 
