@@ -7,7 +7,7 @@ identitiesInUse = dict() #eventually, this should become a username/password com
 
 # hardcoding how long each task should be open for here:
 taskTimings = {
-    'get3': timedelta(seconds=10)
+    'get3': timedelta(seconds=60)
 }
 
 def getNewID(): #just generates a unique value. TODO: update to a hash
