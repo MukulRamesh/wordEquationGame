@@ -73,7 +73,7 @@ async def clientHandler(websocket: websockets.WebSocketServer):
                         newID = requestjson['id']
                         if (clientid.isIDInTask(newID, "get3")):
                             output['code'] = 'check3response'
-                            requestjson['solution'][1], requestjson['solution'][2] = requestjson['solution'][2], requestjson['solution'][1] #swap elems to fit function checkAverage
+                            # requestjson['solution'][1], requestjson['solution'][2] = requestjson['solution'][2], requestjson['solution'][1] #swap elems to fit function checkAverage
                             output['response'] = basictests.checkAverage(requestjson['solution'])
                         else:
                             output = terminationOutput()
