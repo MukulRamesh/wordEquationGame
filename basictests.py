@@ -93,7 +93,7 @@ def getRandomWords(numRand: int, forbidden: list[str] = []):
     return outputVec, outputWords
 
 
-def generateRandomAverage(numRandomWords: int, forbidden: list[str] = [], kAppend: int = 10):
+def generateRandomAverage(numRandomWords: int, forbidden: list[str] = [], kAppend: int = 30):
     '''
     Takes in int `numRandomWords`, an optional list of forbidden words, and an optional int `kAppend` of extra words to generate (only the first distinct numRandomWords words are returned).\n
     Returns a list of `numRandomWords+1` distinct random words. The last word is the average of the first `numRandomWords` words.'''
@@ -131,7 +131,7 @@ def generateRandomAverage(numRandomWords: int, forbidden: list[str] = [], kAppen
 #Some anecdotal evidence for checkAverage:
 #   kAppend == 10 has >90% false negatives, kAppend == 20 has ~5% false negatives
 #   I am using kAppend == 30 to hopefully bring that number to 0, with the risk of significant false positives.
-def checkAverage(wordList: list[str], kAppend: int = 30):
+def checkAverage(wordList: list[str], kAppend: int = 100):
     '''Takes in a list of 2 or more words, and an optional integer `kAppend` denoting `kAppend` extra words to generate.\n
     Returns a boolean representing whether the last word in the list is the average of the rest.\n
     (Generates `wordList.length + kAAppend - 1` possible averages: if the last word matches any of these, returns true)
