@@ -4,6 +4,8 @@ import json
 import random
 import basictests
 import clientid
+import os
+import signal
 
 def terminationOutput():
     '''Generates termination output json. This is what is sent to client when they ask for a response,
@@ -98,8 +100,15 @@ async def clientHandler(websocket: websockets.WebSocketServer):
 
 
 async def main():
-    async with websockets.serve(clientHandler, "", 5150):
-        await asyncio.Future()  # run forever
+    # Set the stop condition when receiving SIGTERM.
+    loop = asyncio.get_running_loop()
+    stop = loop.create_future()
+    loop.add_signal_handler(signal.SIGTERM, stop.set_result, None)
+
+    port = int(os.environ.get("PORT", "5150"))
+
+    async with websockets.serve(clientHandler, "", port):
+        await stop
 
 
 
