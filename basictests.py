@@ -1,11 +1,10 @@
 import pickle
 import numpy as np
 import random
-from pynndescent.pynndescent_ import NNDescent
 
 print("Loading file...")
 
-f = open("./commonMatrix.txt", "r")
+f = open("./cleanCommonMatrix.txt", "r")
 sizeStr = f.readline().split(" ")
 
 numWords = int(sizeStr[0])
