@@ -2,8 +2,6 @@ from pynndescent.pynndescent_ import NNDescent
 import numpy as np
 import pickle
 
-print(pickle.HIGHEST_PROTOCOL)
-
 print("Loading file...")
 
 f = open("./commonMatrix.txt", "r")
