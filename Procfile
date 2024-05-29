@@ -1,1 +1,1 @@
-web: python3.10 sendData.py
+web: python sendData.py
