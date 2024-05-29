@@ -1,6 +1,3 @@
-import generateIndex # just to regenIndex
-
-
 import asyncio
 import websockets
 import json
