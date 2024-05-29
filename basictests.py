@@ -2,7 +2,6 @@ import pickle
 import numpy as np
 import random
 from pynndescent.pynndescent_ import NNDescent
-NNDescent()
 
 print("Loading file...")
 
@@ -27,7 +26,7 @@ wordIndexDict = pickle.load(open(wordIndexFileName, 'rb'))
 print("Loading saved indexWord file...")
 indexWordArray = pickle.load(open(indexWordFileName, 'rb'))
 print("Loading saved index file...")
-indexNN = pickle.load(open(indexFileName, 'rb'))
+NNDescent.indexNN = pickle.load(open(indexFileName, 'rb'))
 
 print("Matrix shape:", matrix.shape)
 print("Done.")
