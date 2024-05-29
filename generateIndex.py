@@ -4,7 +4,7 @@ import pickle
 
 print("Loading file...")
 
-f = open("./cleanCommonMatrix.txt", "r")
+f = open("./cleanCommonMatrixSmall.txt", "r")
 sizeStr = f.readline().split(" ")
 
 numWords = int(sizeStr[0])

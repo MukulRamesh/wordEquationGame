@@ -20,7 +20,7 @@
 
 # print("done.")
 
-file = open("./cleanCommonMatrix.txt" , "r")
+file = open("./cleanCommonMatrixSmall.txt" , "r")
 
 with file as fp:
     original = fp.read()
@@ -31,7 +31,7 @@ with file as fp:
 
 file.close()
 
-fileW = open("./cleanCommonMatrix.txt" , "w")
+fileW = open("./cleanCommonMatrixSmall.txt" , "w")
 fileW.write(toPrepend)
 fileW.write(original)
 fileW.close()

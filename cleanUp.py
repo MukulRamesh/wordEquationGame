@@ -25,4 +25,4 @@ for i in range(numWords):
     if (i % 1000 == 0):
         print(i, '/', numWords)
 
-
+# Currently this generates a file that is slightly too large: the current solution is to truncate the file so that the last 100 or so entries are removed.
