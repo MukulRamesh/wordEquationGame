@@ -19,7 +19,7 @@ vectSize = int(sizeStr[1])
 for i in range(numWords):
     strList = f.readline().split(" ")
 
-    if ((strList[0] not in bads) and (d.check(strList[0]))):
+    if ((len(strList[0]) > 2) and (strList[0] not in bads) and (d.check(strList[0]))):
         outFile.write(" ".join(strList))
 
     if (i % 1000 == 0):
