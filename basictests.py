@@ -26,7 +26,7 @@ wordIndexDict = pickle.load(open(wordIndexFileName, 'rb'))
 print("Loading saved indexWord file...")
 indexWordArray = pickle.load(open(indexWordFileName, 'rb'))
 print("Loading saved index file...")
-NNDescent.indexNN = pickle.load(open(indexFileName, 'rb'))
+indexNN = pickle.load(open(indexFileName, 'rb'))
 
 print("Matrix shape:", matrix.shape)
 print("Done.")
