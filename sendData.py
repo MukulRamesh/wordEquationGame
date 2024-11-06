@@ -61,7 +61,7 @@ async def clientHandler(websocket: websockets.WebSocketServer):
                         newID = requestjson['id']
                         if (clientid.isIDInTask(newID, "get3")):
                             output['code'] = 'get3response'
-                            output['response'] = basictests.generateRandomAverage(2)
+                            output['response'] = basictests.generateSimDiff(2)
                             print(output['response'])
                             random.shuffle(output['response']) # maybe this isnt secure enough? its probably ok for now
                         else:
@@ -73,10 +73,15 @@ async def clientHandler(websocket: websockets.WebSocketServer):
                 case "check3":
                     try:
                         newID = requestjson['id']
-                        if (clientid.isIDInTask(newID, "get3")):
+                        if (clientid.isIDInTask(newID, "get3") and clientid.checkLastInteraction(newID, 1)):
                             output['code'] = 'check3response'
                             # requestjson['solution'][1], requestjson['solution'][2] = requestjson['solution'][2], requestjson['solution'][1] #swap elems to fit function checkAverage
-                            output['response'] = basictests.checkAverage(requestjson['solution'])
+                            response = basictests.checkSimDiff(requestjson['solution'])
+
+                            if (not response):
+                                clientid.markIDTime(newID)
+
+                            output['response'] = response
                         else:
                             output = terminationOutput()
                     except KeyError:
@@ -103,7 +108,7 @@ async def main():
     # Set the stop condition when receiving SIGTERM.
     loop = asyncio.get_running_loop()
     stop = loop.create_future()
-    loop.add_signal_handler(signal.SIGTERM, stop.set_result, None)
+    # loop.add_signal_handler(signal.SIGTERM, stop.set_result, None)
 
     port = int(os.environ.get("PORT", "5150"))
 

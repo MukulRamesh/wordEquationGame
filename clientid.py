@@ -4,6 +4,7 @@ from datetime import timedelta
 
 numIdentitiesInUse = 0
 identitiesInUse = dict() #eventually, this should become a username/password combo, with the addition of guest passes
+identitiesLastUse = dict()
 
 # hardcoding how long each task should be open for here:
 taskTimings = {
@@ -42,7 +43,17 @@ def isIDInTask(id: int, task: str) -> bool:
 
     return False
 
+def markIDTime(id: int):
+    identitiesLastUse[id] = datetime.now()
 
+def checkLastInteraction(id: int, timeframe: float):
+    '''Given an `id` and a `timeframe`, check if the ID has any interactions logged within the last `timeframe` seconds.'''
+    # timeframe in seconds
+    if (id in identitiesLastUse):
+        lastUse = identitiesLastUse[id]
 
+        return not ((datetime.now() - lastUse) < timedelta(seconds=timeframe))
+    else:
+        return True
 
 

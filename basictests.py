@@ -1,6 +1,7 @@
 import pickle
 import numpy as np
 import random
+from scipy.spatial.distance import pdist, squareform
 
 print("Loading file...")
 
@@ -68,7 +69,7 @@ def wordsToVect(wordList: list[str]):
     return outputVector
 
 
-def wiggleVector(vector: np.ndarray, forbidden, wiggleValue: int = 3, wiggleMaxMag: float = 0.2, kAppend: int = 10):
+def wiggleVector(vector: np.ndarray, forbidden, wiggleValue: int = 10, wiggleMaxMag: float = 0.3, kAppend: int = 10):
     rawWiggledVector = vector
 
     flag = True
@@ -120,14 +121,14 @@ def getRandomWords(numRand: int, forbidden: list[str] = []):
         randomWord = indexWordArray[index][0]
 
     outputWords.append(randomWord)
-    outputVec[i] = matrix[index]
+    outputVec[0] = matrix[index]
     forbidden.append(randomWord)
 
     # ---
     # now generate all the other words
 
     for i in range(numRand - 1):
-        wiggledWord, wiggledIndex = wiggleVector(randomWord, forbidden)
+        wiggledWord, wiggledIndex = wiggleVector(outputVec[0], forbidden)
 
         outputWords.append(wiggledWord)
         outputVec[i] = matrix[wiggledIndex]
@@ -138,7 +139,7 @@ def getRandomWords(numRand: int, forbidden: list[str] = []):
     return outputVec, outputWords
 
 
-def generateRandomAverage(numRandomWords: int, forbidden: list[str] = [], kAppend: int = 30):
+def generateRandomAverage(numRandomWords: int, forbidden: list[str] = [], kAppend: int = 10):
     '''
     Takes in int `numRandomWords`, an optional list of forbidden words, and an optional int `kAppend` of extra words to generate (only the first distinct numRandomWords words are returned).\n
     Returns a list of `numRandomWords+1` distinct random words. The last word is the average of the first `numRandomWords` words.'''
@@ -177,7 +178,7 @@ def generateRandomAverage(numRandomWords: int, forbidden: list[str] = [], kAppen
 #Some anecdotal evidence for checkAverage:
 #   kAppend == 10 has >90% false negatives, kAppend == 20 has ~5% false negatives
 #   I am using kAppend == 100 to hopefully bring that number to 0, with the risk of significant false positives.
-def checkAverage(wordList: list[str], kAppend: int = 100):
+def checkAverage(wordList: list[str], kAppend: int = 10):
     '''Takes in a list of 2 or more words, and an optional integer `kAppend` denoting `kAppend` extra words to generate.\n
     Returns a boolean representing whether the last word in the list is the average of the rest.\n
     (Generates `wordList.length + kAAppend - 1` possible averages: if the last word matches any of these, returns true)
@@ -205,6 +206,40 @@ def checkAverage(wordList: list[str], kAppend: int = 100):
             return True
 
     return False
+
+def generateSimDiff(numRandomWords: int, forbidden: list[str] = [], kAppend: int = 10):
+    '''Outputs `numRandomWords + 1` length list.\n
+    List contains `numRandomWords` similar words and the last is a dissimilar (random) word.'''
+
+    simVectors, simNames = getRandomWords(numRandomWords, forbidden)
+    forbidden.extend(simNames)
+    diffVector, diffNames = getRandomWords(1, forbidden)
+
+    simNames.extend(diffNames)
+
+    return simNames
+
+def checkSimDiff(wordList: list[str]):
+    # possibleDiff = wordList.pop()
+    sampleMatrix = np.empty((len(wordList), vectSize))
+
+    for i in range(len(wordList)):
+        word = wordList[i]
+        vectPart = matrix[wordIndexDict[word]]
+        sampleMatrix[i] = vectPart
+
+    # test = np.array(sampleMatrix)
+
+    distMatrix = squareform(pdist(sampleMatrix))
+
+    possibleDiffScore = sum(distMatrix[-1])
+
+    maximumScore = possibleDiffScore
+    for i in range(len(distMatrix)):
+        maximumScore = max(maximumScore, sum(distMatrix[i]))
+
+    return bool(possibleDiffScore == maximumScore)
+
 
 
 
