@@ -68,26 +68,71 @@ def wordsToVect(wordList: list[str]):
     return outputVector
 
 
+def wiggleVector(vector: np.ndarray, forbidden, wiggleValue: int = 3, wiggleMaxMag: float = 0.2, kAppend: int = 10):
+    rawWiggledVector = vector
 
+    flag = True
+    while flag == True:
+        randomEntries = random.sample(range(len(vector)), wiggleValue)
+        for entry in randomEntries:
+            rawWiggledVector[entry] += random.uniform(wiggleMaxMag * -1, wiggleMaxMag)
+
+
+        arrayofVectors = np.empty((1, vectSize), dtype=np.ndarray)
+        arrayofVectors[0] = rawWiggledVector
+
+        k = kAppend
+        indices, distances = indexNN.query(arrayofVectors, k=k)
+        outputWord = "!!None!!"
+
+        for i in range(k):
+            generatedGuess = indexWordArray[indices[0][i]][0]
+
+            if (generatedGuess in forbidden):
+                continue
+            else:
+                outputWord = generatedGuess
+                flag = False
+                break
+
+
+
+    index = wordIndexDict[outputWord]
+
+    return outputWord, index
 
 def getRandomWords(numRand: int, forbidden: list[str] = []):
     '''
-    Takes in `numRand`, and an optional list of forbidden words. \n
-    Returns tuple containing a numpy array that contains numRand distinct word vectors, and a list with the corresponding names'''
+    Takes in `numRand`, an optional list of forbidden words, and a `wiggleValue`. \n
+    The `wiggleValue` determines the number of dimensions that the words differ from each other: larger number is more difficult for the user. Legal interval: [1, 300] \n
+    Returns tuple containing a numpy array that contains `numRand` distinct word vectors, and a list with the corresponding names.
+    '''
     outputVec = np.empty((numRand, vectSize), dtype=np.ndarray)
     outputWords = []
-    for i in range(numRand):
+
+    # ---
+    # choose the first random word
+    index = random.randint(0, numWords)
+    randomWord = indexWordArray[index][0]
+
+    while (randomWord in forbidden):
         index = random.randint(0, numWords)
         randomWord = indexWordArray[index][0]
 
-        while (randomWord in forbidden):
-            index = random.randint(0, numWords)
-            randomWord = indexWordArray[index][0]
+    outputWords.append(randomWord)
+    outputVec[i] = matrix[index]
+    forbidden.append(randomWord)
 
-        outputWords.append(randomWord)
-        outputVec[i] = matrix[index]
+    # ---
+    # now generate all the other words
 
-        forbidden.append(randomWord)
+    for i in range(numRand - 1):
+        wiggledWord, wiggledIndex = wiggleVector(randomWord, forbidden)
+
+        outputWords.append(wiggledWord)
+        outputVec[i] = matrix[wiggledIndex]
+
+        forbidden.append(wiggledWord)
 
 
     return outputVec, outputWords
@@ -122,6 +167,7 @@ def generateRandomAverage(numRandomWords: int, forbidden: list[str] = [], kAppen
             continue
         else:
             outputWord = generatedGuess
+            break
 
     names.append(outputWord)
 
