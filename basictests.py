@@ -69,14 +69,15 @@ def wordsToVect(wordList: list[str]):
     return outputVector
 
 
-def wiggleVector(vector: np.ndarray, forbidden, wiggleValue: int = 10, wiggleMaxMag: float = 0.3, kAppend: int = 10):
+def wiggleVector(vector: np.ndarray, forbidden, wiggleValue: int = 10, wiggleMaxMag: float = 0.3, wiggleMinMag: float = 0.2, kAppend: int = 10):
     rawWiggledVector = vector
 
     flag = True
     while flag == True:
         randomEntries = random.sample(range(len(vector)), wiggleValue)
         for entry in randomEntries:
-            rawWiggledVector[entry] += random.uniform(wiggleMaxMag * -1, wiggleMaxMag)
+            magnitudeOfWiggle = random.uniform(wiggleMinMag, wiggleMaxMag)
+            rawWiggledVector[entry] += magnitudeOfWiggle * random.choice([-1, 1])
 
 
         arrayofVectors = np.empty((1, vectSize), dtype=np.ndarray)
@@ -113,11 +114,11 @@ def getRandomWords(numRand: int, forbidden: list[str] = []):
 
     # ---
     # choose the first random word
-    index = random.randint(0, numWords)
+    index = random.randint(0, numWords - 1)
     randomWord = indexWordArray[index][0]
 
     while (randomWord in forbidden):
-        index = random.randint(0, numWords)
+        index = random.randint(0, (numWords - 1))
         randomWord = indexWordArray[index][0]
 
     outputWords.append(randomWord)
