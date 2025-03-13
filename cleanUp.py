@@ -1,5 +1,6 @@
 import enchant
 from nltk.stem import WordNetLemmatizer as wnl
+from nltk.stem import PorterStemmer as ps
 d = enchant.Dict("en_US")
 
 
@@ -17,16 +18,18 @@ sizeStr = f.readline().split(" ")
 numWords = int(sizeStr[0])
 vectSize = int(sizeStr[1])
 
-seenLemmas = set()
+seenWords = set()
 
 for i in range(numWords):
     strList = f.readline().split(" ")
     wordText = strList[0]
 
-    if ((len(wordText) > 2) and (wordText not in bads) and (d.check(wordText)) and (wnl().lemmatize(wordText) not in seenLemmas)):
-        lemma = wnl().lemmatize(wordText)
-        seenLemmas.add(lemma)
-        strList[0] = lemma
+    lemma = wnl().lemmatize(wordText)
+    stem = ps().stem(lemma)
+
+    if ((len(stem) > 2) and (stem not in bads) and (d.check(stem)) and (stem not in seenWords)):
+        seenWords.add(stem)
+        strList[0] = stem
         outFile.write(" ".join(strList))
 
     if (i % 1000 == 0):
