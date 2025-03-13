@@ -5,7 +5,7 @@ from scipy.spatial.distance import pdist, squareform
 
 print("Loading file...")
 
-f = open("./cleanCommonMatrixSmall.txt", "r")
+f = open("./cleanCommonMatrix.txt", "r")
 sizeStr = f.readline().split(" ")
 
 numWords = int(sizeStr[0])
