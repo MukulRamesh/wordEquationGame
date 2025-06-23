@@ -327,7 +327,7 @@ def startCMDGame():
                     print("Great job! You got it correct.")
                     break
 
-            except not KeyboardInterrupt:
+            except KeyboardInterrupt:
                 print("Incorrect formatting. Make sure the format is followed correctly.")
 
 
